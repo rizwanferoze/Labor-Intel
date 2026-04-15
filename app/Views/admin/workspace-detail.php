@@ -119,8 +119,8 @@ $back_url = admin_url( 'admin.php?page=labor-intel' );
 				<?php esc_html_e( 'All Data Uploaded', 'labor-intel' ); ?>
 			</h3>
 			<p><?php esc_html_e( 'All required files have been uploaded. You can now process the workspace data.', 'labor-intel' ); ?></p>
-			<button type="button" class="button button-primary button-hero" id="li-start-processing" data-workspace-id="<?php echo esc_attr( $workspace->id ); ?>">
-				<span class="dashicons dashicons-controls-play" style="margin-top:5px;"></span>
+			<button type="button" class="button button-primary button-hero" id="li-start-processing" data-workspace-id="<?php echo esc_attr( $workspace->id ); ?>" style="display: inline-flex; align-items: center; gap: 8px;">
+				<span class="dashicons dashicons-controls-play"></span>
 				<?php esc_html_e( 'Start Processing', 'labor-intel' ); ?>
 			</button>
 		</div>
