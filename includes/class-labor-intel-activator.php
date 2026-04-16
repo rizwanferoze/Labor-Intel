@@ -220,6 +220,27 @@ class Labor_Intel_Activator {
 			KEY dim_role_id (dim_role_id)
 		) {$charset_collate};";
 
+		// Compression Model table (per-employee compression analysis, generated during processing).
+		$table_compression_model = $wpdb->prefix . 'labor_intel_compression_model';
+		$sql .= "CREATE TABLE {$table_compression_model} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			workspace_id bigint(20) unsigned NOT NULL,
+			raw_employee_id bigint(20) unsigned NOT NULL,
+			dim_site_id bigint(20) unsigned NOT NULL,
+			dim_role_id bigint(20) unsigned NOT NULL,
+			compression_gap decimal(12,2) DEFAULT 0,
+			compression_exposure decimal(14,2) DEFAULT 0,
+			compressed_flag tinyint(1) DEFAULT 0,
+			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY  (id),
+			UNIQUE KEY ws_employee (workspace_id, raw_employee_id),
+			KEY workspace_id (workspace_id),
+			KEY raw_employee_id (raw_employee_id),
+			KEY dim_site_id (dim_site_id),
+			KEY dim_role_id (dim_role_id),
+			KEY compressed_flag (compressed_flag)
+		) {$charset_collate};";
+
 		// Workspace Completion tracking table (one row per workspace).
 		$table_completion = $wpdb->prefix . 'labor_intel_workspace_completion';
 		$sql .= "CREATE TABLE {$table_completion} (

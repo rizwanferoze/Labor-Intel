@@ -223,9 +223,9 @@ class Labor_Intel_Workspace_Model {
 	/**
 	 * Sync completion tracking based on existing data in tables.
 	 *
-	 * This checks if data exists in each table and updates completion flags accordingly.
-	 * Useful for workspaces that had data uploaded before completion tracking was implemented.
-	 * Only updates flags that need changing to avoid unnecessary status recalculations.
+	 * This checks if data exists in each table (and physical files exist for file-type
+	 * components) and updates completion flags accordingly. Bidirectional: marks complete
+	 * when data exists AND marks incomplete when data or files are missing.
 	 *
 	 * @param int $workspace_id Workspace ID.
 	 * @return bool Whether any changes were made.
@@ -233,10 +233,14 @@ class Labor_Intel_Workspace_Model {
 	public function sync_completion_tracking( $workspace_id ) {
 		$prefix = $this->db->prefix . 'labor_intel_';
 
-		// Get current completion status.
+		// Get current completion status, initializing if missing.
 		$current = $this->get_completion_status( $workspace_id );
 		if ( ! $current ) {
-			return false;
+			$this->init_completion_tracking( $workspace_id );
+			$current = $this->get_completion_status( $workspace_id );
+			if ( ! $current ) {
+				return false;
+			}
 		}
 
 		// Check data existence in each table.
@@ -251,14 +255,40 @@ class Labor_Intel_Workspace_Model {
 			'pricing'         => $this->db->get_var( $this->db->prepare( "SELECT COUNT(*) FROM {$prefix}pricing WHERE workspace_id = %d", $workspace_id ) ) > 0,
 		);
 
+		// For file-type components, also verify physical file existence.
+		$file_components = array( 'dim_sites', 'dim_roles', 'raw_employee', 'raw_comp', 'raw_time', 'role_site_stats' );
+		$upload_dir      = wp_upload_dir();
+		$ws_dir          = $upload_dir['basedir'] . '/labor-intel/' . $workspace_id;
+
+		foreach ( $file_components as $component ) {
+			if ( $checks[ $component ] ) {
+				// DB data exists — also verify physical file is present.
+				$file_exists = false;
+				foreach ( array( 'xlsx', 'xls', 'csv' ) as $ext ) {
+					if ( file_exists( $ws_dir . '/' . $component . '.' . $ext ) ) {
+						$file_exists = true;
+						break;
+					}
+				}
+				// Both DB data AND physical file must exist for file components.
+				$checks[ $component ] = $file_exists;
+			}
+		}
+
 		$changed = false;
 		foreach ( $checks as $component => $has_data ) {
 			$column       = $component . '_complete';
 			$is_complete  = (bool) $current->$column;
 
-			// Only update if status needs to change.
 			if ( $has_data && ! $is_complete ) {
+				// Data exists but not marked complete — mark complete.
 				$result = $this->mark_component_complete( $workspace_id, $component, true );
+				if ( $result ) {
+					$changed = true;
+				}
+			} elseif ( ! $has_data && $is_complete ) {
+				// No data but marked complete — mark incomplete.
+				$result = $this->mark_component_complete( $workspace_id, $component, false );
 				if ( $result ) {
 					$changed = true;
 				}

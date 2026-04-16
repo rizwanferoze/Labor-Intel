@@ -66,6 +66,7 @@ class Labor_Intel_Workspace_Controller {
 		$this->file_controllers['raw_time']           = new Labor_Intel_Raw_Time_Controller();
 		$this->file_controllers['role_site_stats']     = new Labor_Intel_Role_Site_Stats_Controller();
 		$this->file_controllers['clean_data']            = new Labor_Intel_Clean_Data_Controller();
+		$this->file_controllers['compression_model']     = new Labor_Intel_Compression_Model_Controller();
 
 		// Register config controllers.
 		$this->config_controllers['control_panel'] = new Labor_Intel_Control_Panel_Controller();
@@ -228,25 +229,21 @@ class Labor_Intel_Workspace_Controller {
 		}
 
 		// Sync completion tracking based on existing data.
-		// This ensures completion flags are set for data uploaded before tracking was implemented.
 		$this->model->sync_completion_tracking( $workspace_id );
 
 		// Refresh workspace to get updated status after sync.
 		$workspace = $this->model->get_workspace( $workspace_id );
 
-		// Build file types with upload status.
-		$upload_dir = wp_upload_dir();
-		$ws_dir     = $upload_dir['basedir'] . '/labor-intel/' . $workspace_id;
+		// Get completion status from DB — this is the single source of truth.
+		$completion = $this->model->get_completion_status( $workspace_id );
+
+		// Build file types with upload status from completion table.
 		$file_types = array();
 
 		foreach ( $this->file_types as $slug => $type ) {
-			$uploaded = false;
-			foreach ( array( 'xlsx', 'xls', 'csv' ) as $ext ) {
-				if ( file_exists( $ws_dir . '/' . $slug . '.' . $ext ) ) {
-					$uploaded = true;
-					break;
-				}
-			}
+			$column   = $slug . '_complete';
+			$uploaded = $completion && ! empty( $completion->$column );
+
 			$file_types[ $slug ] = array_merge( $type, array(
 				'status' => $uploaded ? 'uploaded' : 'pending',
 			) );

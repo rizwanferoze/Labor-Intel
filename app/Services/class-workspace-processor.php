@@ -63,8 +63,9 @@ class Labor_Intel_Workspace_Processor {
 			'raw_comp'        => $wpdb->prefix . 'labor_intel_raw_comp',
 			'raw_time'        => $wpdb->prefix . 'labor_intel_raw_time',
 			'role_site_stats' => $wpdb->prefix . 'labor_intel_role_site_stats',
-			'clean_data'      => $wpdb->prefix . 'labor_intel_clean_data',
-			'control_panel'   => $wpdb->prefix . 'labor_intel_control_panel',
+			'clean_data'        => $wpdb->prefix . 'labor_intel_clean_data',
+			'compression_model' => $wpdb->prefix . 'labor_intel_compression_model',
+			'control_panel'     => $wpdb->prefix . 'labor_intel_control_panel',
 			'pricing'         => $wpdb->prefix . 'labor_intel_pricing',
 		);
 	}
@@ -83,7 +84,10 @@ class Labor_Intel_Workspace_Processor {
 		// Step 2: Generate clean_data table.
 		$this->process_clean_data();
 
-		// Step 3: Future processing steps will be added here.
+		// Step 3: Generate compression_model table.
+		$this->process_compression_model();
+
+		// Step 4: Future processing steps will be added here.
 		// $this->process_raw_employees();
 		// $this->process_calculations();
 		// etc.
@@ -352,6 +356,26 @@ class Labor_Intel_Workspace_Processor {
 		$inserted = $clean_data_model->bulk_insert_from_employees( $this->workspace_id );
 
 		$this->log( "Inserted {$inserted} rows into clean_data", 'info' );
+	}
+
+	/**
+	 * Process compression_model table.
+	 *
+	 * For each employee, computes compression_gap, compression_exposure, and compressed_flag
+	 * based on role_site_stats rates, raw_time hours, and control_panel risk weight.
+	 */
+	private function process_compression_model() {
+		$this->log( 'Processing compression_model table', 'info' );
+
+		$compression_model = new Labor_Intel_Compression_Model();
+
+		// Clear existing compression data for this workspace.
+		$compression_model->delete_by_workspace( $this->workspace_id );
+
+		// Bulk insert from raw_employees with computed fields.
+		$inserted = $compression_model->bulk_insert_from_employees( $this->workspace_id );
+
+		$this->log( "Inserted {$inserted} rows into compression_model", 'info' );
 	}
 
 	/**
