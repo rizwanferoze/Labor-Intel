@@ -64,7 +64,7 @@ class Labor_Intel_Clean_Data_Model {
 				re.dim_role_id,
 				COALESCE(
 					CASE WHEN rt.total_paid_hours > 0
-						THEN ROUND(rt.overtime_hours / rt.total_paid_hours * 100, 1)
+						THEN ROUND(rt.overtime_hours / rt.total_paid_hours * 100, 5)
 						ELSE 0
 					END,
 				0)

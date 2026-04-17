@@ -66,6 +66,7 @@ class Labor_Intel_Workspace_Processor {
 			'clean_data'        => $wpdb->prefix . 'labor_intel_clean_data',
 			'compression_model' => $wpdb->prefix . 'labor_intel_compression_model',
 			'control_panel'     => $wpdb->prefix . 'labor_intel_control_panel',
+			'leakage_model'     => $wpdb->prefix . 'labor_intel_leakage_model',
 			'pricing'         => $wpdb->prefix . 'labor_intel_pricing',
 		);
 	}
@@ -87,7 +88,10 @@ class Labor_Intel_Workspace_Processor {
 		// Step 3: Generate compression_model table.
 		$this->process_compression_model();
 
-		// Step 4: Future processing steps will be added here.
+		// Step 4: Generate leakage_model table.
+		$this->process_leakage_model();
+
+		// Step 5: Future processing steps will be added here.
 		// $this->process_raw_employees();
 		// $this->process_calculations();
 		// etc.
@@ -376,6 +380,26 @@ class Labor_Intel_Workspace_Processor {
 		$inserted = $compression_model->bulk_insert_from_employees( $this->workspace_id );
 
 		$this->log( "Inserted {$inserted} rows into compression_model", 'info' );
+	}
+
+	/**
+	 * Process leakage_model table.
+	 *
+	 * For each employee, computes role_ot_benchmark, excess_ot, ot_premium_factor, and ot_leakage
+	 * based on clean_data OT ratio, dim_roles benchmark, control_panel defaults, and raw_time hours.
+	 */
+	private function process_leakage_model() {
+		$this->log( 'Processing leakage_model table', 'info' );
+
+		$leakage_model = new Labor_Intel_Leakage_Model();
+
+		// Clear existing leakage data for this workspace.
+		$leakage_model->delete_by_workspace( $this->workspace_id );
+
+		// Bulk insert from raw_employees with computed fields.
+		$inserted = $leakage_model->bulk_insert_from_employees( $this->workspace_id );
+
+		$this->log( "Inserted {$inserted} rows into leakage_model", 'info' );
 	}
 
 	/**

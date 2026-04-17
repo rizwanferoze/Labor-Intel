@@ -210,7 +210,7 @@ class Labor_Intel_Activator {
 			raw_employee_id bigint(20) unsigned NOT NULL,
 			dim_site_id bigint(20) unsigned NOT NULL,
 			dim_role_id bigint(20) unsigned NOT NULL,
-			ot_ratio decimal(8,4) DEFAULT 0,
+			ot_ratio decimal(10,5) DEFAULT 0,
 			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			PRIMARY KEY  (id),
 			UNIQUE KEY ws_employee (workspace_id, raw_employee_id),
@@ -239,6 +239,27 @@ class Labor_Intel_Activator {
 			KEY dim_site_id (dim_site_id),
 			KEY dim_role_id (dim_role_id),
 			KEY compressed_flag (compressed_flag)
+		) {$charset_collate};";
+
+		// Leakage Model table (per-employee OT leakage analysis, generated during processing).
+		$table_leakage_model = $wpdb->prefix . 'labor_intel_leakage_model';
+		$sql .= "CREATE TABLE {$table_leakage_model} (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			workspace_id bigint(20) unsigned NOT NULL,
+			raw_employee_id bigint(20) unsigned NOT NULL,
+			dim_site_id bigint(20) unsigned NOT NULL,
+			dim_role_id bigint(20) unsigned NOT NULL,
+			role_ot_benchmark decimal(8,4) DEFAULT 0,
+			excess_ot decimal(8,4) DEFAULT 0,
+			ot_premium_factor decimal(8,4) DEFAULT 0,
+			ot_leakage decimal(14,2) DEFAULT 0,
+			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY  (id),
+			UNIQUE KEY ws_employee (workspace_id, raw_employee_id),
+			KEY workspace_id (workspace_id),
+			KEY raw_employee_id (raw_employee_id),
+			KEY dim_site_id (dim_site_id),
+			KEY dim_role_id (dim_role_id)
 		) {$charset_collate};";
 
 		// Workspace Completion tracking table (one row per workspace).

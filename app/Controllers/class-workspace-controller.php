@@ -67,6 +67,7 @@ class Labor_Intel_Workspace_Controller {
 		$this->file_controllers['role_site_stats']     = new Labor_Intel_Role_Site_Stats_Controller();
 		$this->file_controllers['clean_data']            = new Labor_Intel_Clean_Data_Controller();
 		$this->file_controllers['compression_model']     = new Labor_Intel_Compression_Model_Controller();
+		$this->file_controllers['leakage_model']         = new Labor_Intel_Leakage_Model_Controller();
 
 		// Register config controllers.
 		$this->config_controllers['control_panel'] = new Labor_Intel_Control_Panel_Controller();

@@ -204,6 +204,26 @@ $back_url = admin_url( 'admin.php?page=labor-intel' );
 					</a>
 				</div>
 			</div>
+
+			<div class="li-file-card li-file-card--saved">
+				<div class="li-file-card__icon">
+					<span class="dashicons dashicons-warning"></span>
+				</div>
+				<div class="li-file-card__body">
+					<h3><?php esc_html_e( 'Leakage Model', 'labor-intel' ); ?></h3>
+					<p class="li-file-card__desc"><?php esc_html_e( 'Per-employee OT leakage and recoverable savings analysis.', 'labor-intel' ); ?></p>
+					<span class="li-file-card__badge li-file-card__badge--uploaded">
+						<span class="dashicons dashicons-yes-alt"></span>
+						<?php esc_html_e( 'Ready', 'labor-intel' ); ?>
+					</span>
+				</div>
+				<div class="li-file-card__action">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=labor-intel&workspace_id=' . $workspace->id . '&view_data=leakage_model' ) ); ?>"
+						class="button button-primary">
+						<?php esc_html_e( 'View Data', 'labor-intel' ); ?>
+					</a>
+				</div>
+			</div>
 		</div>
 	<?php endif; ?>
 </div>

@@ -52,6 +52,7 @@ class Labor_Intel {
 		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Models/class-role-site-stats-model.php';
 		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Models/class-clean-data-model.php';
 		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Models/class-compression-model.php';
+		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Models/class-leakage-model.php';
 		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Models/class-control-panel-model.php';
 		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Models/class-pricing-model.php';
 		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Controllers/class-dim-sites-controller.php';
@@ -62,6 +63,7 @@ class Labor_Intel {
 		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Controllers/class-role-site-stats-controller.php';
 		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Controllers/class-clean-data-controller.php';
 		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Controllers/class-compression-model-controller.php';
+		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Controllers/class-leakage-model-controller.php';
 		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Controllers/class-control-panel-controller.php';
 		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Controllers/class-pricing-controller.php';
 		require_once LABOR_INTEL_PLUGIN_DIR . 'app/Controllers/class-workspace-controller.php';
